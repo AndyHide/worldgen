@@ -2,7 +2,7 @@ from math import sqrt
 from random import randint
 
 
-WIDTH = 50
+WIDTH = 10
 HEIGHT = 10
 NUM_PLATES = 10
 
@@ -37,6 +37,11 @@ class World:
                 print(tile, end='')
             print('')
 
+    def find_borders(self):
+        for row in self.tiles:
+            for tile in row:
+                tile.set_borders(self.tiles)
+
 
 class Plate:
     def __init__(self, x, y, weight, uid):
@@ -70,6 +75,26 @@ class Tile:
     def __str__(self):
         return str(self.plate)
 
+    def set_borders(self, tiles):
+        if self.x > 0 and self.y > 0 and tiles[self.x-1][self.y-1].plate != self.plate:
+            self.border = 1
+        if self.x > 0 and tiles[self.x-1][self.y].plate != self.plate:
+            self.border = 1
+        if self.x > 0 and self.y < HEIGHT-1 and tiles[self.x-1][self.y+1].plate != self.plate:
+            self.border = 1
+
+        if self.y > 0 and tiles[self.x][self.y-1].plate != self.plate:
+            self.border = 1
+        if self.y < HEIGHT-1 and tiles[self.x][self.y+1].plate != self.plate:
+            self.border = 1
+
+        if self.x < WIDTH-1 and self.y > 0 and tiles[self.x+1][self.y-1].plate != self.plate:
+            self.border = 1
+        if self.x < WIDTH-1 and tiles[self.x+1][self.y].plate != self.plate:
+            self.border = 1
+        if self.x < WIDTH-1 and self.y < HEIGHT-1 and tiles[self.x+1][self.y+1].plate != self.plate:
+            self.border = 1
+
 
 if __name__ == '__main__':
     world = World()
@@ -77,3 +102,4 @@ if __name__ == '__main__':
     world.show_plates()
     world.create_tiles()
     world.show_tiles()
+    world.find_borders()
