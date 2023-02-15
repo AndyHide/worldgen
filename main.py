@@ -2,9 +2,9 @@ from math import sqrt
 from random import randint
 
 
-WIDTH = 30
-HEIGHT = 10
-NUM_PLATES = 8
+WIDTH = 10
+HEIGHT = 5
+NUM_PLATES = 2
 
 
 class World:
@@ -14,7 +14,8 @@ class World:
 
     def create_plates(self):
         for i in range(NUM_PLATES):
-            self.plates.append(Plate(randint(0, WIDTH), randint(0, HEIGHT), randint(400, 800)/1000, i))
+            # randint(400, 800)/1000
+            self.plates.append(Plate(randint(0, WIDTH-1), randint(0, HEIGHT-1), randint(400, 800)/1000, i))
 
     def show_plates(self):
         for plate in self.plates:
@@ -47,7 +48,10 @@ class World:
     def show_borders(self):
         for row in self.tiles:
             for tile in row:
-                print(f"{tile.border}", end='')
+                if tile.border == 1:
+                    print("*", end='')
+                else:
+                    print(" ", end='')
             print('')
         print("==========")
 
@@ -86,11 +90,11 @@ class Tile:
 
     def find_plate(self, plates):
         min_distance = 0
-        host_plate = 0
+        host_plate = -1
         for plate in plates:
             distance = sqrt((self.x - plate.x) * (self.x - plate.x) + (self.y - plate.y) * (self.y - plate.y))
             weighted_distance = distance * plate.weight
-            if weighted_distance < min_distance or host_plate == 0:
+            if weighted_distance < min_distance or host_plate == -1:
                 host_plate = plate.id
                 min_distance = weighted_distance
         self.plate = host_plate
@@ -99,7 +103,7 @@ class Tile:
         return str(self.plate)
 
     def set_borders(self, tiles):
-        if self.x > 0:
+        """if self.x > 0:
             if self.y > 0:
                 if self.plate != tiles[self.y-1][self.x-1].plate:
                     self.border = 1
@@ -124,7 +128,34 @@ class Tile:
                 self.border = 1
             if self.y < HEIGHT-1:
                 if self.plate != tiles[self.y+1][self.x+1].plate:
-                    self.border = 1
+                    self.border = 1"""
+
+        for neighbour in self.list_neighbours():
+            if self.plate != tiles[neighbour[0]][neighbour[1]].plate:
+                self.border = 1
+
+    def list_neighbours(self):
+        nb = []
+        if self.x > 0:
+            if self.y > 0:
+                nb.append([self.y-1, self.x-1])
+            nb.append([self.y, self.x-1])
+            if self.y < HEIGHT-1:
+                nb.append([self.y+1, self.x-1])
+
+        if self.y > 0:
+            nb.append([self.y-1, self.x])
+        if self.y < HEIGHT-1:
+            nb.append([self.y+1, self.x])
+
+        if self.x < WIDTH-1:
+            if self.y > 0:
+                nb.append([self.y-1, self.x+1])
+            nb.append([self.y, self.x+1])
+            if self.y < HEIGHT-1:
+                nb.append([self.y+1, self.x+1])
+
+        return nb
 
 
 if __name__ == '__main__':
